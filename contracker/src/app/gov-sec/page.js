@@ -3,7 +3,7 @@ import { useState } from "react";
 import Page1 from "@/Components/gov/page1";
 import Page2 from "@/Components/gov/page2";
 import Page3 from "@/Components/gov/page3";
-import UserProfile from "@/Components/UserProfile/profile";
+import UserProfile from "@/Components/UserProfile/public-profile";
 
 const ContractBottom = () => {
   const [activeTab, setActiveTab] = useState("Issue");
@@ -24,7 +24,7 @@ const ContractBottom = () => {
   return (
     <div className="flex flex-col h-screen bg-black text-white">
       <div className="fixed bottom-52 right-5 z-50">
-        <UserProfile />
+       
       </div>
       <div className="flex-1 p-4">{renderScene()}</div>
 
@@ -49,5 +49,3 @@ const ContractBottom = () => {
 };
 
 export default ContractBottom;
-
-

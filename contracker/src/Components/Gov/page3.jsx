@@ -59,7 +59,7 @@ export default function TendersPage() {
               <button
                 onClick={() =>
                   router.push(
-                    `/bid-auth?tenderId=${encodeURIComponent(
+                    `/gov-sec/bid-auth?tenderId=${encodeURIComponent(
                       JSON.stringify(item._id)
                     )}`
                   )

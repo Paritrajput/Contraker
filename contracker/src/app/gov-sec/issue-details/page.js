@@ -81,7 +81,7 @@ function issueDetail() {
             <button
               onClick={() => {
                 router.push(
-                  `/make-tender?issue=${encodeURIComponent(
+                  `/gov-sec/make-tender?issue=${encodeURIComponent(
                     JSON.stringify(parsedIssue)
                   )}`
                 );

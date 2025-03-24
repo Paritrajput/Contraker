@@ -8,9 +8,9 @@ contract Bidding {
         uint256 bidId;
         uint256 tenderId;
         address contractor;
-        string contractorMongoId; // MongoDB ID of contractor
+        string contractorMongoId;
         uint256 bidAmount;
-        string proposalDocument; // IPFS Hash
+        string proposalDocument;
         uint256 experienceYears;
         uint256 contractorRating;
         bool isApproved;
@@ -23,17 +23,32 @@ contract Bidding {
         address contractor;
         string contractorMongoId;
         uint256 contractAmount;
+        uint256 paidAmount;
         bool isCompleted;
+    }
+
+    struct PaymentRequest {
+        uint256 requestId;
+        uint256 contractId;
+        uint256 amountRequested;
+        bool isApproved;
+        bool isRejected;
     }
 
     uint256 private bidCounter;
     uint256 private contractCounter;
-    mapping(uint256 => Bid[]) public tenderBids; // Maps tenderId to an array of bids
-    mapping(uint256 => Contract) public contracts; // Maps contractId to contract details
+    uint256 private paymentCounter;
+    mapping(uint256 => Bid[]) public tenderBids;
+    mapping(uint256 => Contract) public contracts;
+    Contract[] private allContracts;
+    mapping(uint256 => PaymentRequest[]) public paymentRequests; // Maps contractId to payment requests
 
     event BidPlaced(uint256 bidId, uint256 tenderId, string contractorMongoId);
     event BidApproved(uint256 bidId, uint256 tenderId, address contractor);
     event ContractCreated(uint256 contractId, uint256 tenderId, address contractor);
+    event PaymentRequested(uint256 requestId, uint256 contractId, uint256 amountRequested);
+    event PaymentApproved(uint256 requestId, uint256 contractId, uint256 amountApproved);
+    event PaymentRejected(uint256 requestId, uint256 contractId);
 
     function placeBid(
         uint256 _tenderId,
@@ -79,19 +94,77 @@ contract Bidding {
         }
         require(bidFound, "Bid not found");
 
-        // Automatically create contract
         contractCounter++;
-        contracts[contractCounter] = Contract({
+        Contract memory newContract = Contract({
             contractId: contractCounter,
             tenderId: _tenderId,
             winningBidId: _bidId,
             contractor: winningContractor,
             contractorMongoId: winningMongoId,
             contractAmount: winningAmount,
+            paidAmount: 0,
             isCompleted: false
         });
 
+        contracts[contractCounter] = newContract;
+        allContracts.push(newContract);
+
         emit ContractCreated(contractCounter, _tenderId, winningContractor);
+    }
+
+    function requestPayment(uint256 _contractId, uint256 _amount) public {
+        require(_amount > 0, "Payment amount must be greater than zero");
+        require(contracts[_contractId].contractor == msg.sender, "Only contractor can request payment");
+        require(contracts[_contractId].paidAmount + _amount <= contracts[_contractId].contractAmount, "Requested amount exceeds contract value");
+        
+        paymentCounter++;
+        paymentRequests[_contractId].push(PaymentRequest({
+            requestId: paymentCounter,
+            contractId: _contractId,
+            amountRequested: _amount,
+            isApproved: false,
+            isRejected: false
+        }));
+        
+        emit PaymentRequested(paymentCounter, _contractId, _amount);
+    }
+
+    function approvePayment(uint256 _contractId, uint256 _requestId) public {
+        PaymentRequest[] storage requests = paymentRequests[_contractId];
+        bool requestFound = false;
+        uint256 approvedAmount;
+        
+        for (uint256 i = 0; i < requests.length; i++) {
+            if (requests[i].requestId == _requestId && !requests[i].isApproved && !requests[i].isRejected) {
+                requests[i].isApproved = true;
+                approvedAmount = requests[i].amountRequested;
+                contracts[_contractId].paidAmount += approvedAmount;
+                
+                if (contracts[_contractId].paidAmount == contracts[_contractId].contractAmount) {
+                    contracts[_contractId].isCompleted = true;
+                }
+                
+                requestFound = true;
+                emit PaymentApproved(_requestId, _contractId, approvedAmount);
+                break;
+            }
+        }
+        require(requestFound, "Payment request not found or already processed");
+    }
+
+    function rejectPayment(uint256 _contractId, uint256 _requestId) public {
+        PaymentRequest[] storage requests = paymentRequests[_contractId];
+        bool requestFound = false;
+        
+        for (uint256 i = 0; i < requests.length; i++) {
+            if (requests[i].requestId == _requestId && !requests[i].isApproved && !requests[i].isRejected) {
+                requests[i].isRejected = true;
+                requestFound = true;
+                emit PaymentRejected(_requestId, _contractId);
+                break;
+            }
+        }
+        require(requestFound, "Payment request not found or already processed");
     }
 
     function getBids(uint256 _tenderId) public view returns (Bid[] memory) {
@@ -100,5 +173,9 @@ contract Bidding {
 
     function getContract(uint256 _contractId) public view returns (Contract memory) {
         return contracts[_contractId];
+    }
+
+    function getAllContracts() public view returns (Contract[] memory) {
+        return allContracts;
     }
 }

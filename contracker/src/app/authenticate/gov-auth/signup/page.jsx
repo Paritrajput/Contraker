@@ -4,9 +4,15 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 
-export default function ContractorLogin() {
+export default function ContractorSignup() {
   const router = useRouter();
-  const [formData, setFormData] = useState({ email: "", password: "" });
+  const [formData, setFormData] = useState({
+    name: "",
+    position:"",
+    email: "",
+    password: "",
+    
+  });
   const [error, setError] = useState("");
 
   const handleChange = (e) => {
@@ -18,23 +24,37 @@ export default function ContractorLogin() {
     setError("");
 
     try {
-      const res = await axios.post("/api/contractor/login", formData);
+      const res = await axios.post("/api/gov-sec/signup", formData);
       if (res.data.success) {
-        localStorage.setItem("token", res.data.token);
-
-        router.push("/contract-bottom");
+        router.push("/authenticate/gov-auth/login");
       }
     } catch (err) {
-      setError(err.response?.data?.error || "Login failed");
+      setError(err.response?.data?.error || "Signup failed");
     }
   };
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-black text-white">
       <div className="bg-gray-900 p-6 rounded-lg shadow-lg w-96">
-        <h2 className="text-2xl font-bold text-teal-400 text-center">Contractor Login</h2>
+        <h2 className="text-2xl font-bold text-teal-400 text-center">Contractor Signup</h2>
         {error && <p className="text-red-500 text-sm text-center">{error}</p>}
         <form onSubmit={handleSubmit} className="mt-4">
+          <input
+            type="text"
+            name="name"
+            placeholder="Full Name"
+            className="w-full p-2 mb-3 rounded bg-gray-800 text-white border border-gray-600"
+            onChange={handleChange}
+            required
+          />
+             <input
+            type="text"
+            name="position"
+            placeholder="Your Position"
+            className="w-full p-2 mb-3 rounded bg-gray-800 text-white border border-gray-600"
+            onChange={handleChange}
+            required
+          />
           <input
             type="email"
             name="email"
@@ -51,12 +71,13 @@ export default function ContractorLogin() {
             onChange={handleChange}
             required
           />
+  
           <button className="w-full bg-teal-500 hover:bg-teal-600 text-white p-2 rounded transition">
-            Login
+            Sign Up
           </button>
         </form>
         <p className="text-gray-400 text-sm text-center mt-3">
-          Don't have an account? <a href="/contractor/signup" className="text-teal-400">Sign up</a>
+          Already have an account? <a href="/authenticate/gov-auth/login" className="text-teal-400">Login</a>
         </p>
       </div>
     </div>

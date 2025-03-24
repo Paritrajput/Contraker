@@ -97,7 +97,7 @@ const TenderDesc = () => {
       <button
         onClick={() =>
           router.push(
-            `/bid-page?tenderId=${encodeURIComponent(
+            `/contractor-sec/bid-page?tenderId=${encodeURIComponent(
               tenderData.blockchainTenderId
             )}&mongoId=${encodeURIComponent(tenderData._id)}`
           )

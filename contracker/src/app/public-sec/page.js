@@ -2,28 +2,27 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { ethers } from "ethers"; // ✅ Correctly importing ethers
+import { ethers } from "ethers";
 import IssueManagementABI from "@/contracts/IssueManagement.json";
-import UserProfile from "@/Components/UserProfile/profile";
 import axios from "axios";
 
-const issueManagementAddress = "0x7739dF3d308e20774001bC3A9FB4589A65Cc0245"; // ✅ Replace with your deployed contract address
+const issueManagementAddress = "0x7739dF3d308e20774001bC3A9FB4589A65Cc0245";
 
 export default function IssuesList() {
   const [issues, setIssues] = useState([]);
   const [issues2, setIssues2] = useState([]);
-  const [walletAddress, setWalletAddress] = useState(null);
+  const [loading, setLoading] = useState(true);
   const router = useRouter();
 
   useEffect(() => {
     const fetchIssue = async () => {
       try {
         const response = await axios.get("/api/public-issue");
-
-        console.log(response.data);
         setIssues2(response.data.issues);
       } catch (error) {
-        console.log(error);
+        console.error("Error fetching public issues:", error);
+      } finally {
+        setLoading(false);
       }
     };
     fetchIssue();
@@ -40,16 +39,15 @@ export default function IssuesList() {
     }
 
     try {
-      const provider = new ethers.BrowserProvider(window.ethereum); // ✅ Use BrowserProvider for ethers v6
+      const provider = new ethers.BrowserProvider(window.ethereum);
       const signer = await provider.getSigner();
 
       const contract = new ethers.Contract(
-        issueManagementAddress, // ✅ Correct contract address
-        IssueManagementABI.abi, // ✅ Use correct ABI
+        issueManagementAddress,
+        IssueManagementABI.abi,
         signer
       );
 
-      console.log("Connected to contract:", contract);
       fetchIssues(contract);
     } catch (error) {
       console.error("Error connecting wallet:", error);
@@ -58,35 +56,25 @@ export default function IssuesList() {
 
   const fetchIssues = async (contractInstance) => {
     try {
-      console.log("Fetching issues...");
-
       const issuesData = await contractInstance.getAllIssues();
-      console.log("Blockchain Data:", issuesData);
 
-      if (!issuesData || issuesData.length === 0) {
-        console.log("No issues found");
-        return;
-      }
+      if (!issuesData || issuesData.length === 0) return;
 
       const [ids, names, descriptions, approvals, latitudes, longitudes] =
         issuesData;
 
       const formattedIssues = ids.map((id, index) => ({
         id: Number(id),
-        // id:ids[index],
-
         issue_type: names[index],
         description: descriptions[index],
         approvals: Number(approvals[index]),
         location: {
-          latitude: Number(latitudes[index]) / 1e6, // Convert int to float if needed
+          latitude: Number(latitudes[index]) / 1e6,
           longitude: Number(longitudes[index]) / 1e6,
         },
       }));
 
-      console.log("Formatted Issues:", formattedIssues);
       setIssues(formattedIssues);
-      console.log(issues);
     } catch (error) {
       console.error("Error fetching issues from blockchain:", error);
     }
@@ -97,55 +85,57 @@ export default function IssuesList() {
       <h1 className="text-3xl font-bold mb-6 text-center">Reported Issues</h1>
 
       <div className="grid gap-6">
-        {issues2.length > 0 ? (
-          issues2.map((issue) => (
-            <div
-              key={issue._id}
-              className="bg-gray-900 p-5 rounded-lg shadow-lg border border-gray-700"
-            >
-              <h2 className="text-xl font-semibold text-teal-400">
-                {issue.issue_type}
-              </h2>
-              <p className="text-gray-300">{issue.description}</p>
-              <span className="text-xl font-semibold text-teal-400 flex">
-                Location:{" "}
-                <h2 className="text-white font-normal">{`${issue.placename}`}</h2>
-              </span>
-              {/* <h1 className="text-xl font-semibold text-teal-400">
-                Coordinates:{" "}
-                {`${issue.location.lat}/${issue.location.lng}`}
-              </h1> */}
-
-              {/* <p className="text-gray-300">{issue.date_of_complaint}</p> */}
-              <div className="flex items-center gap-10">
-                <p className="text-gray-400">Votes: ✅ {issue.approvals}</p>
-                <h2 className="flex gap-3">
-                  <h2 className="text-md  font-normal text-gray-400">
-                    Date Of Complaint:
-                  </h2>
-                  {issue.date_of_complaint}
-                </h2>
-              </div>
-
-              <button
-                onClick={() => router.push(`/people-voting/${issue._id}`)}
-                className="mt-3 px-4 py-2 bg-teal-500 text-black font-medium rounded-lg hover:bg-teal-400 transition"
+        {loading
+          ? // Skeleton Loading Cards
+            Array.from({ length: 4 }).map((_, index) => (
+              <div
+                key={index}
+                className="bg-gray-900 p-5 rounded-lg shadow-lg border border-gray-700 animate-pulse"
               >
-                View Details
-              </button>
-            </div>
-          ))
-        ) : (
-          <p className="text-gray-400 text-center">No issues found.</p>
-        )}
-      </div>
-      <div className="fixed  z-50">
-        <UserProfile />
+                <div className="h-6 bg-gray-700 rounded w-3/4 mb-4"></div>
+                <div className="h-4 bg-gray-700 rounded w-1/2 mb-2"></div>
+                <div className="h-4 bg-gray-700 rounded w-1/4 mb-2"></div>
+                <div className="h-10 bg-gray-700 rounded mt-4"></div>
+              </div>
+            ))
+          : issues2.length > 0
+          ? issues2.map((issue) => (
+              <div
+                key={issue._id}
+                className="bg-gray-900 p-5 rounded-lg shadow-lg border border-gray-700"
+              >
+                <h2 className="text-xl font-semibold text-teal-400">
+                  {issue.issue_type}
+                </h2>
+                <p className="text-gray-300">{issue.description}</p>
+                <strong className="text-teal-400">Location : </strong>{issue.placename}
+
+                <div className="flex items-center gap-10">
+                  <p className="text-gray-400">Votes: ✅ {issue.approvals}</p>
+                  <h2 className="flex gap-3">
+                    <h2 className="text-md font-normal text-gray-400">
+                      Date Of Complaint:
+                    </h2>
+                    {issue.date_of_complaint}
+                  </h2>
+                </div>
+
+                <button
+                  onClick={() =>
+                    router.push(`/public-sec/people-voting/${issue._id}`)
+                  }
+                  className="mt-3 px-4 py-2 bg-teal-500 text-black font-medium rounded-lg hover:bg-teal-400 transition"
+                >
+                  View Details
+                </button>
+              </div>
+            ))
+          : !loading && <p className="text-gray-400 text-center">No issues found.</p>}
       </div>
 
       {/* Floating Add Issue Button */}
       <button
-        onClick={() => router.push("/public-issue")}
+        onClick={() => router.push("/public-sec/public-issue")}
         className="fixed bottom-6 right-6 bg-green-500 text-black px-6 py-3 rounded-full text-xl font-bold shadow-xl hover:bg-green-400 transition"
       >
         +

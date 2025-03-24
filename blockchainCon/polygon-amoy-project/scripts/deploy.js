@@ -7,6 +7,8 @@ async function main() {
   // const TenderCreation = await hre.ethers.getContractFactory("TenderCreation");
   // const GovContract = await hre.ethers.getContractFactory("GovContract");
   const Bidding = await hre.ethers.getContractFactory("Bidding");
+ 
+  
 
   // const issueManagement = await IssueManagement.deploy();
   // const votingSystem = await VotingSystem.deploy();

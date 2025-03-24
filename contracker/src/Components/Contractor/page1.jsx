@@ -43,7 +43,7 @@ export default function TendersPage() {
                 timeOfComplition={item.bidClosingDate}
                 onClick={() =>
                   router.push(
-                    `/tender-desc?tender=${encodeURIComponent(
+                    `/contractor-sec/tender-desc?tender=${encodeURIComponent(
                       JSON.stringify(item)
                     )}`
                   )

@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 
-export default function UserProfile() {
+export default function ContractorProfile() {
   const router = useRouter();
   const [showPopup, setShowPopup] = useState(false);
   const [user, setUser] = useState(null);
@@ -14,14 +14,14 @@ export default function UserProfile() {
     if (token) {
       axios.get("/api/contractor/profile", { headers: { Authorization: `Bearer ${token}` } })
         .then((res) => setUser(res.data))
-        .catch(() => localStorage.removeItem("contractorToken"));
+        .catch(() => localStorage.removeItem("token"));
     }
   }, []);
 
   const handleLogout = async () => {
     // await axios.post("/api/contractor/logout");
     localStorage.removeItem("token");
-    router.push("/contractor/login");
+    router.push("/authenticate/contractor/login");
   };
 
   return (

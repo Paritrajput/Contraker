@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import PublicProfile from "@/Components/UserProfile/public-profile";
 
 export default function ContractorLayout({ children }) {
   const router = useRouter();
@@ -18,5 +19,7 @@ export default function ContractorLayout({ children }) {
 
   if (!isAuthenticated) return null; // Prevent rendering content until auth check is done
 
-  return <>{children}</>;
+  return <>{children}
+  <PublicProfile/>
+  </>;
 }

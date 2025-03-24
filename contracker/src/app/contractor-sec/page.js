@@ -1,16 +1,16 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import Page1 from '@/Components/contractor/page1';
-import Page2 from '@/Components/contractor/page2';
-import UserProfile from '@/Components/UserProfile/profile';
+import { useState } from "react";
+import Page1 from "@/Components/contractor/page1";
+import Page2 from "@/Components/contractor/page2";
+import UserProfile from "@/Components/UserProfile/public-profile";
 
 const ContractBottom = () => {
   const [index, setIndex] = useState(0);
 
   const routes = [
-    { key: 'Tender', title: 'Tenders', icon: '📄' },
-    { key: 'Contract', title: 'Contract', icon: '✍️' },
+    { key: "Tender", title: "Tenders", icon: "📄" },
+    { key: "Contract", title: "Contract", icon: "✍️" },
   ];
 
   const renderScene = () => {
@@ -28,10 +28,9 @@ const ContractBottom = () => {
     <div className="flex flex-col h-[90vh] bg-black text-white ">
       {/* Main Content */}
       <div className="flex-grow h-[70%] p-6 ">{renderScene()}</div>
-      <div className='fixed bottom-52 right-5 z-50'>
-      <UserProfile />
+      <div className="fixed bottom-52 right-5 z-50">
+      
       </div>
-    
 
       {/* Bottom Navigation */}
       <div className="flex justify-around p-4 bg-gray-900 border-t border-gray-700 fixed bottom-0 w-full z-50">
@@ -39,7 +38,9 @@ const ContractBottom = () => {
           <button
             key={route.key}
             className={`flex flex-col items-center p-2 transition-all duration-300 ${
-              index === i ? 'text-teal-400 scale-110' : 'text-gray-400 hover:text-white'
+              index === i
+                ? "text-teal-400 scale-110"
+                : "text-gray-400 hover:text-white"
             }`}
             onClick={() => setIndex(i)}
           >
@@ -53,7 +54,6 @@ const ContractBottom = () => {
 };
 
 export default ContractBottom;
-
 
 /* 
 // React Native (original logic)
