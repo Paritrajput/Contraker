@@ -34,7 +34,7 @@ export default function ContractsPage() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {loading
-          ? // Skeleton Loading Cards
+          ?
             Array.from({ length: 6 }).map((_, index) => (
               <div
                 key={index}
@@ -45,16 +45,16 @@ export default function ContractsPage() {
                 <div className="h-10 bg-gray-700 rounded mt-4"></div>
               </div>
             ))
-          : // Render Actual Data
-            tenders.map((item) => (
+          : 
+            tenders.map((item, index) => (
               <div
-                key={item.tenderId}
+                key={index}
                 className="bg-gray-900 p-6 rounded-lg shadow-md transition hover:scale-105 hover:bg-gray-800"
               >
                 <h2 className="text-xl font-semibold text-teal-400">
                   {item.contractId}
                 </h2>
-                <p className="text-gray-400 mt-2">Ref ID: {item.bidAmount}</p>
+                <p className="text-gray-400 mt-2">Bid Amount: {item.bidAmount}</p>
                 <button
                   onClick={() =>
                     router.push(

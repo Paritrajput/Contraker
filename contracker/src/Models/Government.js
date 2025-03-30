@@ -1,3 +1,4 @@
+import { Verified } from "lucide-react";
 import mongoose from "mongoose";
 
 const GovernmentSchema = new mongoose.Schema({
@@ -5,7 +6,8 @@ const GovernmentSchema = new mongoose.Schema({
   postion: String,
   email: { type: String, unique: true },
   password: String,
-  secretCode: { type: String, unique: true },
+  isVerified: Boolean,
+  verifiedBy: String,
 });
 
 export default mongoose.models.Government ||

@@ -2,131 +2,96 @@
 
 import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
-import { ethers } from "ethers";
-import IssueManagementABI from "@/contracts/IssueManagement.json";
 import axios from "axios";
-
-// const issueManagementAddress = "0x7739dF3d308e20774001bC3A9FB4589A65Cc0245";
 
 const PeopleVote = () => {
   const router = useRouter();
   const { id } = useParams();
-  const [issue, setIssue] = useState(null);
   const [issue2, setIssue2] = useState(null);
   const [isVoting, setIsVoting] = useState(false);
-  const [vote, setVote]=useState(null)
-  const [walletAddress, setWalletAddress] = useState(null);
+  const [userLocation, setUserLocation] = useState(null);
+  const [eligible, setEligible] = useState(null);
+  const [issueLocation, setIssueLocation] = useState(null);
 
+  // Fetch issue details
   useEffect(() => {
     const getIssue = async () => {
       try {
         const response = await axios.get(`/api/public-issue/${id}`);
         setIssue2(response.data);
-        console.log(response.data);
+        setIssueLocation(response.data.location);
       } catch {
-        console.log("failed to fetch issue");
+        console.log("Failed to fetch issue");
       }
     };
-    getIssue();
+    if (id) getIssue();
+  }, [id]); // ✅ Depend on 'id'
+
+  // Get user's geolocation
+  useEffect(() => {
+    if ("geolocation" in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          setUserLocation({ lat: latitude, lon: longitude });
+        },
+        (error) => {
+          console.error("Error fetching location:", error);
+          alert("Location access is required to verify voting eligibility.");
+        }
+      );
+    } else {
+      alert("Geolocation is not supported by this browser.");
+    }
   }, []);
 
-  // useEffect(() => {
-  //   connectWallet();
-  // }, []);
+  // Check eligibility only when both issue location & user location are available
+  useEffect(() => {
+    if (userLocation && issueLocation) {
+      checkEligibility(userLocation.lat, userLocation.lon);
+    }
+  }, [userLocation, issueLocation]);
 
-  // const connectWallet = async () => {
-  //   if (!window.ethereum) {
-  //     alert("Please install MetaMask!");
-  //     return;
-  //   }
-
-  //   try {
-  //     const provider = new ethers.BrowserProvider(window.ethereum);
-  //     const signer = await provider.getSigner();
-  //     setWalletAddress(await signer.getAddress());
-
-  //     const contract = new ethers.Contract(
-  //       issueManagementAddress,
-  //       IssueManagementABI.abi,
-  //       signer
-  //     );
-  //     fetchIssue(contract);
-  //   } catch (error) {
-  //     console.error("Error connecting wallet:", error);
-  //   }
-  // };
-
-  const handleVoting= async (Id, vote) => {
+  // Function to call Next.js API
+  const checkEligibility = async (lat, lon) => {
     try {
-      const response = await axios.put(`/api/public-issue/${Id}/${vote}`);
-    
-      console.log(response.data);
-    } catch {
-      console.log("failed to fetch issue");
+      const response = await fetch("/api/check-eligibility", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userLat: lat,
+          userLon: lon,
+          issueLat: issueLocation.lat,
+          issueLon: issueLocation.lng,
+        }),
+      });
+
+      const data = await response.json();
+      console.log(data);
+      setEligible(data.eligible);
+    } catch (error) {
+      console.error("Error checking eligibility:", error);
     }
   };
 
-  // const fetchIssue = async (contract) => {
-  //   try {
-  //     const issueData = await contract.getIssueById(Number(id));
-  //     console.log("Issue Data:", issueData);
-  //     console.log(Number(issueData[0]));
+  const handleVoting = async (vote) => {
+    if (!eligible) {
+      alert("You are not eligible for voting.");
+      return;
+    }
 
-  //     setIssue({
-  //       id: Number(issueData[0]),
-  //       issue_type: issueData[1],
-  //       description: issueData[2],
-  //       imageUrl: issueData.imageUrl,
-  //     });
-  //   } catch (error) {
-  //     console.error("Error fetching issue:", error);
-  //   }
-  // };
-
-  // const handleVote = async (issueId, voteType) => {
-  //   if (!window.ethereum) {
-  //     alert("Please install MetaMask!");
-  //     return;
-  //   }
-
-  //   try {
-  //     const provider = new ethers.BrowserProvider(window.ethereum);
-  //     const signer = await provider.getSigner();
-  //     const contract = new ethers.Contract(
-  //       issueManagementAddress,
-  //       IssueManagementABI.abi,
-  //       signer
-  //     );
-
-  //     // Ensure issueId is a valid number
-  //     issueId = Number(issueId);
-
-  //     if (isNaN(issueId)) {
-  //       console.error("Invalid issue ID format");
-  //       alert("Invalid issue ID format");
-  //       return;
-  //     }
-
-  //     // Check if issue exists before voting
-  //     const issueData = await contract.getIssueById(issueId);
-  //     if (!issueData || issueData[0] == 0) {
-  //       console.error("Issue does not exist");
-  //       alert("Issue not found. Please select a valid issue.");
-  //       return;
-  //     }
-
-  //     const voteValue = voteType === "approve" ? true : false; // true = approve, false = deny
-  //     console.log(voteValue);
-  //     const tx = await contract.voteOnIssue(issueId - 1, voteType);
-  //     await tx.wait(); // Wait for transaction confirmation
-
-  //     console.log("Vote submitted successfully!");
-  //     setIsVoting(true);
-  //   } catch (error) {
-  //     console.error("Error submitting vote:", error);
-  //     alert(error.reason || "Error submitting your vote. Please try again.");
-  //   }
-  // };
+    try {
+      const response = await fetch("/api/public-issue/vote", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ issueId: issue2._id, vote: vote }),
+      });
+      alert("Voted Successfully");
+      console.log(response);
+    } catch {
+      console.log("Failed to fetch issue");
+    }
+  };
 
   if (!issue2)
     return <p className="text-center text-white">Loading issue details...</p>;
@@ -143,17 +108,13 @@ const PeopleVote = () => {
         {!isVoting ? (
           <div className="mt-6 flex gap-4 justify-center">
             <button
-              onClick={() =>{ 
-                handleVoting(issue2.id, true)
-              }}
+              onClick={() => handleVoting(true)}
               className="px-4 py-2 bg-green-500 text-black font-semibold rounded-md hover:bg-green-400 transition shadow-lg"
             >
               ✅ Approve
             </button>
             <button
-              onClick={() => {
-                handleVoting(issue2.id, false)
-              }}
+              onClick={() => handleVoting(false)}
               className="px-4 py-2 bg-red-500 text-black font-semibold rounded-md hover:bg-red-400 transition shadow-lg"
             >
               ❌ Deny

@@ -32,12 +32,12 @@ export default function ContractsPage() {
   }, []);
 
   useEffect(() => {
-    if (!contractorId) return; // Prevent API call if contractorId is empty
+    if (!contractorId) return;
 
     const fetchData = async () => {
       try {
         const response = await axios.get(`/api/contracts/${contractorId}`);
-        setContracts(response.data.contracts); // Fix: Extract contracts array properly
+        setContracts(response.data.contracts); 
         console.log(response.data.contracts)
       } catch (error) {
         console.error("Could not get contracts", error);
@@ -67,8 +67,9 @@ export default function ContractsPage() {
         ) : (
           contracts.map((item) => (
             <CardComponent
-              key={item.contractId} // Unique key
-              title={`Tender ID: ${item.mongoTenderId}`}
+              key={item.contractId} 
+              title={`Contract ID: ${item.mongoContractId
+              }`}
               content={`Bid Amount: ${item.contractAmount} ETH`}
               status={`Status: ${item.isCompleted? "Completed":"Pending"}`}
               onClick={() =>

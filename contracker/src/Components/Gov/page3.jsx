@@ -14,6 +14,7 @@ export default function TendersPage() {
     const fetchData = async () => {
       try {
         const response = await axios.get("/api/tender/get-tender");
+
         setTenders(response.data);
         console.log(response.data);
       } catch (error) {
@@ -45,7 +46,7 @@ export default function TendersPage() {
         </div>
       ) : error ? (
         <p className="text-center text-red-500">{error}</p>
-      ) : (
+      ) : tenders.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {tenders.map((item, index) => (
             <div
@@ -59,8 +60,8 @@ export default function TendersPage() {
               <button
                 onClick={() =>
                   router.push(
-                    `/gov-sec/bid-auth?tenderId=${encodeURIComponent(
-                      JSON.stringify(item._id)
+                    `/gov-sec/bid-auth?tender=${encodeURIComponent(
+                      JSON.stringify(item)
                     )}`
                   )
                 }
@@ -70,6 +71,10 @@ export default function TendersPage() {
               </button>
             </div>
           ))}
+        </div>
+      ) : (
+        <div className="my-5 justify-self-center text-xl ">
+          No Active Tenders
         </div>
       )}
     </div>

@@ -11,7 +11,7 @@ export async function GET() {
     try {
         await dbConnect();
         
-        // Fetch active tenders from MongoDB
+
         const contracts = await Contract.find();
 
 
@@ -28,7 +28,7 @@ export async function GET() {
               wallet
             );
 
-        // Fetch blockchain data for each tender
+ 
         const contractsWithBlockchainData = await Promise.all(contracts.map(async (tender) => {
             try {
                 console.log(Number(tender.blockchainTenderId))
@@ -38,7 +38,7 @@ export async function GET() {
                     ...tender._doc, 
 
                     blockchainData: {
-                        bidId: tenderData[0].toString(), // Convert BigInt to string
+                        bidId: tenderData[0].toString(), 
                         tenderId: tenderData[1],
                         contractor: tenderData[2],
                         contractorMongoId: tenderData[3],
@@ -52,7 +52,7 @@ export async function GET() {
                 };
             } catch (error) {
                 console.error(`Error fetching blockchain data for tender ${tender.tenderId}:`, error);
-                return { ...tender._doc, blockchainData: null }; // If error, return null for blockchain data
+                return { ...tender._doc, blockchainData: null }; 
             }
         }));
 

@@ -1,14 +1,15 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 const paymentSchema = new mongoose.Schema({
-    referenceId: String,
-    bidAmount: Number,
-    amountUsed: Number,
-    selectedOption: String,
-    paymentMade: Number,
-    status: Boolean,
+  contractorId: String,
+  contractorWallet: String,
+  contractId: String,
+  bidAmount: Number,
+  amountUsed: Number,
+  reason: String,
+  paymentMade: Number,
+  status: String,
 });
 
-const payment = mongoose.model('payment', paymentSchema);
-
-module.exports = payment;
+export default mongoose.models.Payments ||
+  mongoose.model("Payments", paymentSchema);

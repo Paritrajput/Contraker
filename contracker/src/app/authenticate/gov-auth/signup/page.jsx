@@ -8,10 +8,9 @@ export default function ContractorSignup() {
   const router = useRouter();
   const [formData, setFormData] = useState({
     name: "",
-    position:"",
+    position: "",
     email: "",
     password: "",
-    
   });
   const [error, setError] = useState("");
 
@@ -36,7 +35,9 @@ export default function ContractorSignup() {
   return (
     <div className="flex items-center justify-center min-h-screen bg-black text-white">
       <div className="bg-gray-900 p-6 rounded-lg shadow-lg w-96">
-        <h2 className="text-2xl font-bold text-teal-400 text-center">Contractor Signup</h2>
+        <h2 className="text-2xl font-bold text-teal-400 text-center">
+          Contractor Signup
+        </h2>
         {error && <p className="text-red-500 text-sm text-center">{error}</p>}
         <form onSubmit={handleSubmit} className="mt-4">
           <input
@@ -47,7 +48,7 @@ export default function ContractorSignup() {
             onChange={handleChange}
             required
           />
-             <input
+          <input
             type="text"
             name="position"
             placeholder="Your Position"
@@ -71,13 +72,16 @@ export default function ContractorSignup() {
             onChange={handleChange}
             required
           />
-  
+
           <button className="w-full bg-teal-500 hover:bg-teal-600 text-white p-2 rounded transition">
             Sign Up
           </button>
         </form>
         <p className="text-gray-400 text-sm text-center mt-3">
-          Already have an account? <a href="/authenticate/gov-auth/login" className="text-teal-400">Login</a>
+          Already have an account?{" "}
+          <a href="/authenticate/gov-auth/login" className="text-teal-400">
+            Login
+          </a>
         </p>
       </div>
     </div>

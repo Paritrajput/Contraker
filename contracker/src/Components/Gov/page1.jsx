@@ -45,9 +45,9 @@ export default function IssuesList() {
             </div>
           ))
         ) : issues.length > 0 ? (
-          issues.map((item) => (
+          issues.map((item, index) => (
             <div
-              key={item.id}
+              key={index}
               className="bg-gray-900 p-5 rounded-lg shadow-lg border border-gray-700 transition transform hover:scale-105 hover:border-teal-400"
             >
               <h2 className="text-xl font-semibold text-teal-300">{item.issue_type}</h2>

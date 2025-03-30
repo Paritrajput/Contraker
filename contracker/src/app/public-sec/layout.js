@@ -11,7 +11,7 @@ export default function ContractorLayout({ children }) {
   useEffect(() => {
     const token = localStorage.getItem("public-token");
     if (!token) {
-      router.push("/public-auth/login"); // Redirect to login if no token
+      router.push("/authenticate/public-auth/login"); // Redirect to login if no token
     } else {
       setIsAuthenticated(true);
     }

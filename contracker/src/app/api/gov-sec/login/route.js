@@ -7,55 +7,40 @@ import Owner from "@/Models/Owner";
 
 export async function POST(req) {
   await dbConnect();
-  const { email, password } = await req.json();
+  
   try {
-    const owner = await Owner.findOne({ email });
-    if (!owner) {
-      const contractor = await Government.findOne({ email });
-      if (!contractor) {
-        return NextResponse.json(
-          { error: "Invalid credentials" },
-          { status: 401 }
-        );
+    const { email, password } = await req.json();
+
+    let user = await Owner.findOne({ email });
+    let isOwner = true;
+    let isSuperOwner = false;
+
+    if (!user) {
+      user = await Government.findOne({ email });
+      isOwner = false;
+      if (!user) {
+        return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
       }
-
-      const validPassword = await bcrypt.compare(password, contractor.password);
-      if (!validPassword) {
-        return NextResponse.json(
-          { error: "Invalid credentials" },
-          { status: 401 }
-        );
-      }
-
-      const token = jwt.sign(
-        { id: contractor._id, owner: false },
-        process.env.JWT_SECRET,
-        {
-          expiresIn: "7d",
-        }
-      );
-
-      return NextResponse.json({ success: true, token });
     }
 
-    const validPassword = await bcrypt.compare(password, owner.password);
+    const validPassword = await bcrypt.compare(password, user.password);
     if (!validPassword) {
-      return NextResponse.json(
-        { error: "Invalid credentials" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
+    }
+
+    if (isOwner) {
+      isSuperOwner = user.isSuperOwner || false;
     }
 
     const token = jwt.sign(
-      { id: owner._id, owner: true, superOwner: owner.isSuperOwner },
+      { id: user._id, owner: isOwner, superOwner: isSuperOwner },
       process.env.JWT_SECRET,
-      {
-        expiresIn: "7d",
-      }
+      { expiresIn: "7d" }
     );
 
     return NextResponse.json({ success: true, token });
-  } catch {
-    return NextResponse.json({ error: "could not find user" }, {status:500});
+  } catch (error) {
+    console.error("Auth Error:", error);
+    return NextResponse.json({ error: "Server error. Please try again." }, { status: 500 });
   }
 }

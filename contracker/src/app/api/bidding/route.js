@@ -55,8 +55,9 @@ console.log(experienceYears)
       contractorId,
       Number(bidAmount),
       proposalDocument,
-      experienceYears,
-      contractorRating
+      Math.floor(Number(experienceYears)),
+      Math.floor(Number(contractorRating)),
+      
     );
     const receipt=await tx.wait(); // Wait for transaction confirmation
 

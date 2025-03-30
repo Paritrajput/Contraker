@@ -61,11 +61,12 @@ function CardComponent({ title, content, timeOfComplition, onClick }) {
       className="bg-gray-900 p-4 rounded-lg shadow-lg mb-4 cursor-pointer transition-transform transform hover:scale-105 hover:bg-gray-800 border border-gray-700"
       onClick={onClick}
     >
-      <h2 className="text-xl font-semibold text-white">{title}</h2>
-      <p className="text-green-400 font-medium">{content}</p>
-      <span className="flex">
-        <p className="font-medium text-white">Last date for bid submission :</p>
-        <p className="text-green-400 font-medium"> {timeOfComplition}</p>
+      
+      <p className="text-green-400 text-xl  font-semibold"> {title}</p>
+      <h2 className="font-medium text-white">{content}</h2>
+      <span className="flex items-center">
+        <p className="font-normal text-lg text-green-400">Last date for bid submission : </p>
+        <p className="text-white font-medium "> {timeOfComplition}</p>
       </span>
     </div>
   );
