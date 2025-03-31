@@ -2,11 +2,11 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { ethers } from "ethers";
-import IssueManagementABI from "@/contracts/IssueManagement.json";
+// import { ethers } from "ethers";
+// import IssueManagementABI from "@/contracts/IssueManagement.json";
 import axios from "axios";
 
-const issueManagementAddress = "0x7739dF3d308e20774001bC3A9FB4589A65Cc0245";
+// const issueManagementAddress = "0x7739dF3d308e20774001bC3A9FB4589A65Cc0245";
 
 export default function IssuesList() {
   const [issues, setIssues] = useState([]);
@@ -28,57 +28,7 @@ export default function IssuesList() {
     fetchIssue();
   }, []);
 
-  useEffect(() => {
-    connectWallet();
-  }, []);
-
-  const connectWallet = async () => {
-    if (!window.ethereum) {
-      alert("Please install MetaMask!");
-      return;
-    }
-
-    try {
-      const provider = new ethers.BrowserProvider(window.ethereum);
-      const signer = await provider.getSigner();
-
-      const contract = new ethers.Contract(
-        issueManagementAddress,
-        IssueManagementABI.abi,
-        signer
-      );
-
-      fetchIssues(contract);
-    } catch (error) {
-      console.error("Error connecting wallet:", error);
-    }
-  };
-
-  const fetchIssues = async (contractInstance) => {
-    try {
-      const issuesData = await contractInstance.getAllIssues();
-
-      if (!issuesData || issuesData.length === 0) return;
-
-      const [ids, names, descriptions, approvals, latitudes, longitudes] =
-        issuesData;
-
-      const formattedIssues = ids.map((id, index) => ({
-        id: Number(id),
-        issue_type: names[index],
-        description: descriptions[index],
-        approvals: Number(approvals[index]),
-        location: {
-          latitude: Number(latitudes[index]) / 1e6,
-          longitude: Number(longitudes[index]) / 1e6,
-        },
-      }));
-
-      setIssues(formattedIssues);
-    } catch (error) {
-      console.error("Error fetching issues from blockchain:", error);
-    }
-  };
+  
 
   return (
     <div className="p-6 min-h-screen bg-black text-white">

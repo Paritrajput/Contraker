@@ -58,33 +58,9 @@ const MakeTender = () => {
    console.log(creator)
 
 
-  // const connectWallet = async () => {
-  //   if (!window.ethereum) {
-  //     alert("MetaMask not found! Install MetaMask.");
-  //     return;
-  //   }
-
-  //   try {
-  //     const provider = new ethers.BrowserProvider(window.ethereum);
-  //     const signer = await provider.getSigner();
-  //     setWalletAddress(await signer.getAddress());
-  //   } catch (error) {
-  //     console.error("Error connecting wallet:", error);
-  //   }
-  // };
-
-  // Handle input changes
   
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  // Submit Tender Data
   const submitTender = async () => {
-    // if (!walletAddress) {
-    //   alert("Connect your wallet first!");
-    //   return;
-    // }
+ 
 
     setLoading(true);
     setError(null);
@@ -106,29 +82,7 @@ const MakeTender = () => {
       if (!mongoResponse.ok)
         throw new Error(mongoData.error || "Failed to store in MongoDB");
 
-      // Store on Blockchain
-      // const provider = new ethers.BrowserProvider(window.ethereum);
-      // const signer = await provider.getSigner();
-      // const contract = new ethers.Contract(
-      //   tenderContractAddress,
-      //   TenderCreationABI.abi,
-      //   signer
-      // );
-
-      // const tx = await contract.createTender(
-      //   formData.title,
-      //   formData.description,
-      //   formData.category,
-      //   ethers.parseEther(formData.minBidAmount),
-      //   ethers.parseEther(formData.maxBidAmount),
-      //   // formData.paymentMode,
-      //   Math.floor(new Date(formData.bidOpeningDate).getTime() / 1000), // Convert to UNIX timestamp
-      //   Math.floor(new Date(formData.bidClosingDate).getTime() / 1000),
-      //   parsedIssue.placename,
-      //   String(creator._id)
-      // );
-
-      // await tx.wait();
+     
 
       setSuccess("Tender successfully created on MongoDB and Blockchain!");
       setFormData({
@@ -188,36 +142,7 @@ const MakeTender = () => {
           Enter Tender Details
         </h2>
 
-        {/* {[
-          { name: "title", label: "Title" },
-          { name: "description", label: "Description" },
-          { name: "category", label: "Category" },
-          { name: "minBidAmount", label: "Minimum Bid Amount" },
-          { name: "maxBidAmount", label: "Minimum Bid Amount" },
-          { name: "bidOpeningDate", label: "Bid Opening Date" },
-          { name: "bidClosingDate", label: "Bid Closing Date" },
-        ].map((field) => (
-          <div key={field.name} className="mt-3">
-            <label className="block font-semibold text-gray-300">
-              {field.label}
-            </label>
-            <input
-              type="text"
-              name={field.name}
-              value={formData[field.name]}
-              onChange={handleChange}
-              className="w-full border border-gray-700 bg-gray-800 p-2 rounded-md text-white placeholder-gray-400 mt-1 focus:ring-2 focus:ring-teal-500 focus:outline-none"
-              placeholder={`Enter ${field.label}`}
-            />
-          </div>
-        ))} */}
-
-        {/* <button
-          onClick={connectWallet}
-          className="mb-4 px-4 py-2 bg-blue-600 rounded-lg"
-        >
-          {walletAddress ? `Connected: ${walletAddress}` : "Connect Wallet"}
-        </button> */}
+      
 
         <div className="grid gap-4">
           <div className="mt-2">
