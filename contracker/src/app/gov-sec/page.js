@@ -1,8 +1,8 @@
 "use client";
 import { useEffect, useState } from "react";
-import Page1 from "@/Components/gov/page1";
-import Page2 from "@/Components/gov/page2";
-import Page3 from "@/Components/gov/page3";
+import Page1 from "@/Components/Gov/page1";
+import Page2 from "@/Components/Gov/page2";
+import Page3 from "@/Components/Gov/page3";
 import UserProfile from "@/Components/UserProfile/public-profile";
 import { useGovUser } from "@/Context/govUser";
 import { useRouter } from "next/navigation";
