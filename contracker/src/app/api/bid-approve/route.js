@@ -12,6 +12,8 @@ export async function POST(req) {
   try {
     await dbConnect();
 
+
+
     const expiredTenders = await Tender.find({
       bidClosingDate: { $lte: new Date() },
       active: true,
@@ -67,17 +69,49 @@ export async function POST(req) {
         winner: contractorId,
       });
 
-      const newContract = new Contract({
-        contractId: `CON-${Date.now()}`,
-        tenderId,
-        winner: contractorId,
-        bidAmount,
-        paidAmount: 0,
-        createdAt: new Date(),
-        blockchainContractId: null,
-      });
+      // const newContract = new Contract({
+      //   contractId: `CON-${Date.now()}`,
+      //   tenderId,
+      //   winner: contractorId,
+      //   bidAmount,
+      //   paidAmount: 0,
+      //   createdAt: new Date(),
+      //   blockchainContractId: null,
+      // });
+      // Inside the loop where contract is created
+const milestones = [
+  {
+    description: "Initial Planning & Documentation",
+    amount: bidAmount * 0.2, // 20% payment
+    dueDate: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000), // 15 days from now
+  },
+  {
+    description: "50% Project Completion",
+    amount: bidAmount * 0.3, // 30% payment
+    dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days from now
+  },
+  {
+    description: "Final Project Completion & Approval",
+    amount: bidAmount * 0.5, // 50% payment
+    dueDate: new Date(Date.now() + 60 * 24 * 60 * 60 * 1000), // 60 days from now
+  },
+];
 
-      const savedContract = await newContract.save();
+const newContract = new Contract({
+  contractId: `CON-${Date.now()}`,
+  tenderId,
+  winner: contractorId,
+  bidAmount,
+  paidAmount: 0,
+  milestones,
+  createdAt: new Date(),
+  blockchainContractId: null,
+});
+
+const savedContract = await newContract.save();
+
+
+      
 
       const provider = new ethers.JsonRpcProvider(
         process.env.NEXT_PUBLIC_RPC_URL

@@ -1,24 +1,28 @@
 import mongoose from "mongoose";
-import Payment from "./Payment";
 
-const ContractSchema = new mongoose.Schema({
-  contractId: { type: String, required: true, unique: true },
-  tenderId: { type: String, required: true },
-  winner: { type: String, required: true },
-  bidAmount: { type: Number, required: true },
-  createdAt: { type: Date, default: Date.now },
-  paidAmount: Number,
-  availableFund:Number,
-  isCompleted: Boolean,
-  blockchainContractId: { type: String },
-  transactionHash: { type: String },
-  payments: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Payment",
-    },
-  ],
+const MilestoneSchema = new mongoose.Schema({
+  description: String,
+  amount: Number,
+  dueDate: Date,
+  status: {
+    type: String,
+    enum: ["Pending", "Completed", "Rejected"],
+    default: "Pending",
+  },
+  approvalVotes: { type: Number, default: 0 },
+  rejectionVotes: { type: Number, default: 0 },
 });
 
-export default mongoose.models.Contract ||
-  mongoose.model("Contract", ContractSchema);
+const ContractSchema = new mongoose.Schema({
+  contractId: String,
+  tenderId: { type: mongoose.Schema.Types.ObjectId, ref: "Tender" },
+  winner: { type: mongoose.Schema.Types.ObjectId, ref: "Contractor" },
+  bidAmount: Number,
+  paidAmount: Number,
+  createdAt: { type: Date, default: Date.now },
+  blockchainContractId: String,
+  transactionHash: String,
+  milestones: [MilestoneSchema],
+});
+
+export default mongoose.models.Contract || mongoose.model("Contract", ContractSchema);

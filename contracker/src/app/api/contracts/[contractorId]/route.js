@@ -48,38 +48,49 @@ export async function GET(req) {
     console.log("Contracts fetched from MongoDB:", mongoContracts);
 
     const formattedContracts = await Promise.all(
-      blockchainContracts.map(async (c) => {
-        const matchingMongoContract = mongoContracts.find(
-          (m) =>
-            String(m.winner) === String(c.contractorMongoId) &&
-            Number(m.blockchainContractId) === Number(c.contractId)
-        );
-        console.log("matching: ", matchingMongoContract);
-        let tenderDetail = null;
-        if (matchingMongoContract) {
-          tenderDetail = await Tender.findById(
-            matchingMongoContract.tenderId
-          ).lean();
-        }
-
-        return {
-          contractId: Number(c.contractId),
-          tenderId: Number(c.tenderId),
-          winningBidId: Number(c.winningBidId),
-          contractor: c.contractor,
-          contractorMongoId: c.contractorMongoId,
-          contractAmount: Number(c.contractAmount),
-          isCompleted: c.isCompleted,
-          mongoContractId: matchingMongoContract._id,
-          projectTitle: tenderDetail?.title || "Unknown Project",
-          projectDescription:
-            tenderDetail?.description || "No description available",
-          workLocation: tenderDetail?.location || "N/A",
-          mongoTenderId: tenderDetail?._id || "N/A",
-          issue: tenderDetail?.issueDetails || "N/A",
-        };
-      })
+      blockchainContracts
+        .map(async (c) => {
+          const matchingMongoContract = mongoContracts.find((m) => {
+            return (
+              String(m.winner) === String(c.contractorMongoId) &&
+              Number(m.blockchainContractId) === Number(c.contractId)
+            );
+          });
+    
+          if (!matchingMongoContract) {
+            console.warn(`No matching contract found for blockchain contractId: ${c.contractId}`);
+            return null; // Exclude this contract from the final result
+          }
+    
+          let tenderDetail = null;
+          if (matchingMongoContract) {
+            tenderDetail = await Tender.findById(
+              matchingMongoContract.tenderId
+            ).lean();
+          }
+    
+          return {
+            contractId: Number(c.contractId),
+            tenderId: Number(c.tenderId),
+            winningBidId: Number(c.winningBidId),
+            contractor: c.contractor,
+            contractorMongoId: c.contractorMongoId,
+            contractAmount: Number(c.contractAmount),
+            isCompleted: c.isCompleted,
+            mongoContractId: matchingMongoContract._id,
+            projectTitle: tenderDetail?.title || "Unknown Project",
+            projectDescription: tenderDetail?.description || "No description available",
+            workLocation: tenderDetail?.location || "N/A",
+            mongoTenderId: tenderDetail?._id || "N/A",
+            issue: tenderDetail?.issueDetails || "N/A",
+          };
+        })
     );
+    
+    const validContracts = formattedContracts.filter((c) => c !== null); // Remove undefined/null values
+    
+    return NextResponse.json({ contracts: validContracts });
+    
 
     return NextResponse.json({ contracts: formattedContracts });
   } catch (error) {

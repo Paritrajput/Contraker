@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import Public from "@/Models/Public"; 
-import {dbConnect} from "@/lib/dbConnect";
+import Public from "@/Models/Public";
+import { dbConnect } from "@/lib/dbConnect";
 
 export async function POST(req) {
   await dbConnect();
@@ -18,7 +18,9 @@ export async function POST(req) {
     return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
   }
 
-  const token = jwt.sign({ id: contractor._id }, process.env.JWT_SECRET, { expiresIn: "7d" });
+  const token = jwt.sign({ id: contractor._id }, process.env.JWT_SECRET, {
+    expiresIn: "7d",
+  });
 
   return NextResponse.json({ success: true, token });
 }

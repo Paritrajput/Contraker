@@ -7,21 +7,18 @@ export async function POST(req, context) {
   await dbConnect();
 
   try {
-
     const params = await context.params;
     const { id } = params;
-    const { ownerId } = await req.json(); 
+    const { ownerId } = await req.json();
     console.log("id:", id);
 
     console.log("owner:", ownerId);
 
-  
     const adminRequest = await AdminRequest.findById(id);
     console.log("admin req:", adminRequest);
     if (!adminRequest) {
       return NextResponse.json({ error: "Request not found" }, { status: 404 });
     }
-
 
     const user = await Government.findById(adminRequest.userId);
     console.log("user:", user);
@@ -29,7 +26,6 @@ export async function POST(req, context) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
- 
     user.verifiedBy = ownerId;
     user.isVerified = true;
     await user.save();

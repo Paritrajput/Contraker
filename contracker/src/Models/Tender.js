@@ -13,7 +13,7 @@ const tenderSchema = new mongoose.Schema({
   status: {
     type: String,
     enum: ["Active", "Completed", "Closed"],
-    default: "Pending",
+    default: "Active",
   },
   active: Boolean,
   blockchainTenderId: String,

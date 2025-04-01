@@ -4,9 +4,7 @@ import React, { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { ethers } from "ethers";
 import axios from "axios";
-import TenderCreationABI from "@/contracts/TenderCreation.json"; // Update with actual ABI path
 
-// const tenderContractAddress = "0xYourContractAddress"; 
 
 const MakeTender = () => {
   const searchParams = useSearchParams();
@@ -18,7 +16,7 @@ const MakeTender = () => {
     console.log(parsedIssue)
 
   const [creator, setCreator] = useState(null);
-  const [walletAddress, setWalletAddress] = useState(null);
+
   // const [formData, setFormData] = useState({
   //   referenceNumber: "",
   //   type: "",
@@ -67,7 +65,6 @@ const MakeTender = () => {
     setSuccess(null);
 
     try {
-      // Store in MongoDB
       const mongoResponse = await fetch("/api/tender/create-tender", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -109,6 +106,14 @@ const MakeTender = () => {
       </div>
     );
   }
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
+  
 
   return (
     <div className="flex flex-col items-center bg-black text-white p-6 min-h-screen">
@@ -136,7 +141,7 @@ const MakeTender = () => {
         </p>
       </div>
 
-      {/* Tender Form */}
+     
       <div className="bg-gray-900 p-6 rounded-lg shadow-lg w-full max-w-lg mt-6">
         <h2 className="text-2xl font-bold text-teal-400">
           Enter Tender Details

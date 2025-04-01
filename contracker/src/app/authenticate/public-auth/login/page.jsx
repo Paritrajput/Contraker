@@ -32,7 +32,9 @@ export default function ContractorLogin() {
   return (
     <div className="flex items-center justify-center min-h-screen bg-black text-white">
       <div className="bg-gray-900 p-6 rounded-lg shadow-lg w-96">
-        <h2 className="text-2xl font-bold text-teal-400 text-center">Public Login</h2>
+        <h2 className="text-2xl font-bold text-teal-400 text-center">
+          Public Login
+        </h2>
         {error && <p className="text-red-500 text-sm text-center">{error}</p>}
         <form onSubmit={handleSubmit} className="mt-4">
           <input
@@ -56,7 +58,10 @@ export default function ContractorLogin() {
           </button>
         </form>
         <p className="text-gray-400 text-sm text-center mt-3">
-          Don't have an account? <a href="/Public-Sec/signup" className="text-teal-400">Sign up</a>
+          Don't have an account?{" "}
+          <a href="/authenticate/public-auth/signup" className="text-teal-400">
+            Sign up
+          </a>
         </p>
       </div>
     </div>
